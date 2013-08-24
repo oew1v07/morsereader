@@ -6,6 +6,9 @@ const int ledPin = 13;       // the pin that the LED is attached to
 int buttonPushCounter = 0;   // counter for the number of button presses
 int buttonState = 0;         // current state of the button
 int lastButtonState = 0;     // previous state of the button
+long ButtonPressTimeOn = 0;  // time from when button goes on to being off
+long ButtonPressTimeOff = 0; // time from when button goes off to being on
+long TimeHeld = 0;           // time between button going on and button going off
 
 void setup() {
   // initialize the button pin as a input:
@@ -23,34 +26,30 @@ void loop() {
 
   // compare the buttonState to its previous state
   if (buttonState != lastButtonState) {
-    // if the state has changed, increment the counter
+    // if the state has changed
     if (buttonState == HIGH) {
       // if the current state is HIGH then the button
-      // wend from off to on:
-      buttonPushCounter++;
+      // went from off to on:
+      ButtonPressTimeOn = millis();
       Serial.println("on");
-      Serial.print("number of button pushes:  ");
-      Serial.println(buttonPushCounter);
+      
     } 
     else {
       // if the current state is LOW then the button
       // wend from on to off:
-      Serial.println("off"); 
+      ButtonPressTimeOff = millis();
+      Serial.println("off");
     }
+    
+    TimeHeld = ButtonPressTimeOff - ButtonPressTimeOn;
+    Serial.print("The button was held for:  ");
+    Serial.print(TimeHeld);
+    Serial.println("ms");
+    
   }
+  
+  
   // save the current state as the last state, 
   //for next time through the loop
   lastButtonState = buttonState;
-
-  
-  // turns on the LED every four button pushes by 
-  // checking the modulo of the button push counter.
-  // the modulo function gives you the remainder of 
-  // the division of two numbers:
-  if (buttonPushCounter % 4 == 0) {
-    digitalWrite(ledPin, HIGH);
-  } else {
-   digitalWrite(ledPin, LOW);
-  }
-  
 }
